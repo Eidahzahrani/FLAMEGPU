@@ -99,7 +99,7 @@ int main()
 		iterations(m);
 		ofstream outfile;
 		XmlWriter xml;
-		outfile.open("C:\\FLAMEGPU\\examples\\Abstract_Model\\src\\model\\XMLModelFile.xml");
+		outfile.open("..\\..\\src\\model\\XMLModelFile.xml");
 		flame_model.outputXML(outfile, xml);
 		outfile.close(); 
 		addModel_Functions(m);

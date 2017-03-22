@@ -32,7 +32,7 @@ void Create_Plot(FileModel model){
 	int z;
 	int counter = 2;
 	string s;
-	File.open("C:\\FLAMEGPU\\examples\\Abstract_Model\\plot_agent_counts.plot.gpl");
+	File.open("..\\..\\plot_agent_counts.plot.gpl");
 	if (!File.is_open()) {
 		// The file could not be opened
 	}
@@ -67,7 +67,7 @@ void Create_Plot(FileModel model){
 		cout << "z2" << z2;
 		for (int i = 0; i < z2; i++){
 			if (j==Lines.size()-1)
-				File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "'" << endl;
+				File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "'," << endl;
 			else
 				File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "', \\" << endl;
 			counter++;

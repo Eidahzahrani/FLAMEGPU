@@ -30,7 +30,7 @@ void iterations(FileModel m){
 	FileAgent agent("E");
 	string master;
 	string slave;
-	a_file.open("C:\\FLAMEGPU\\examples\\Abstract_Model\\iterations\\0.xml");
+	a_file.open("..\\..\\iterations\\0.xml");
 	if (!a_file.is_open()) {
 		// The file could not be opened
 	}

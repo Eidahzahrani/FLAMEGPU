@@ -42,7 +42,7 @@ int state = 0;
 void addModel_Functions(FileModel m){
 
 	string s;
-	file.open("C:\\FLAMEGPU\\examples\\Abstract_Model\\src\\model\\functions.c");
+	file.open("..\\..\\src\\model\\functions.c");
 	if (!file.is_open()) {
 		// The file could not be opened
 	}
@@ -110,7 +110,8 @@ void define_state(FileModel m){
 	file << "#define ZMAX		  	10.0f" << endl;
 	file << "//Interaction radius" << endl;
 	file << "#define radius 1.0f" << endl;
-	file << "#define SPEED 0.005f" << endl << endl;;
+	file << "#define Time 10" << endl;
+	file << "#define SPEED 0.0007f" << endl << endl;;
 	
 	agents = m.getUniqueAgents();
 	int size = agents.size();
@@ -198,8 +199,8 @@ void exitfunction(FileModel m){
 	file << "/*" << endl;
 	file << " *Exit_Function....." << endl;
 	file << "*/" << endl;
-	file << "__FLAME_GPU_EXIT_FUNC__ void exitFunction(){" << endl << endl;
-	file << "FILE *output = fopen(""\"C:\\"<<"\\FLAMEGPU\\"<<"\\examples\\"<<"\\Abstract_Model\\"<<"\\output.dat""\",  ""\"w""\");" << endl << endl;
+	file << "__FLAME_GPU_EXIT_FUNC__ void exitFunction(){" << endl << endl; 
+	file << "FILE *output = fopen(" << "\"output.dat""\",  ""\"w""\");" << endl << endl;
 
 	file << "fprintf(output, ""\"#I";
 	vector<string>s;
@@ -241,28 +242,45 @@ void move_function(string agent){
 	file << "  float z1 = agent->z;" << endl;
 	file << "  float random = rnd(rand48);" << endl;
 	file << "   if (random < 0.1f) {" << endl;
-	file << "		x1 = x1 <= 0.0 ? 0.0 : x1 - SPEED;" << endl;
-	file << " }" << endl;
-	file << "	else if (random < 0.2f) {" << endl;
-	file << "      x1 = x1 >= XMAX ? XMAX : x1 + SPEED;" << endl;
-	file << " }" << endl;
-	file << "	else if (random < 0.3f) {" << endl;
-	file << "      y1 = y1 >= YMAX ? YMAX : y1 + SPEED;" << endl;
-	file << " }" << endl;
-	file << "	else if (random < 0.4f){" << endl;
-	file << "      y1 = y1 <= 0.0 ? 0.0 : y1 - SPEED;" << endl;
-	file << " }" << endl;
-	file << "   else if (random < 0.5f) {" << endl;
-	file << "	   z1 = z1 >= ZMAX ? ZMAX : z1 + SPEED;" << endl;
-	file << " }" << endl;
-	file << "   else  if (random < 0.6f){" << endl;
-	file << "    z1 = z1 <= 0.0 ? 0.0 : z1 - SPEED;" << endl;
-	file << " }" << endl;
-	file << "/* update memory with new parameters*/" << endl;
+	file << "for (int i = 0; i < Time; ++i){" << endl;
+	file << "		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;" << endl;
 	file << "		agent->x = x1;" << endl;
 	file << "       agent->y = y1;" << endl;
 	file << "       agent->z = z1;" << endl;
 	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
+	file << " }" << endl;
+	file << " }" << endl;
+	file << "random = rnd(rand48);" << endl;
+	file << "	    if (random <= 0.5f){" << endl;
+	file << "for (int i = 0; i < Time; ++i){" << endl;
+	file << "      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;" << endl;
+	file << "		agent->x = x1;" << endl;
+	file << "       agent->y = y1;" << endl;
+	file << "       agent->z = z1;" << endl;
+	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
+	file << " }" << endl;
+	file << " }" << endl;
+	file << "random = rnd(rand48);" << endl;
+	file << "	    if (random < 0.72f){" << endl;
+	file << "for (int i = 0; i < Time; ++i){" << endl;
+	file << "      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;" << endl;
+	file << "		agent->x = x1;" << endl;
+	file << "       agent->y = y1;" << endl;
+	file << "       agent->z = z1;" << endl;
+	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
+	file << " }" << endl;
+	file << " }" << endl;
+	file << "random = rnd(rand48);" << endl;
+	file << "	    if (random < 0.92f){" << endl;
+	file << "for (int i = 0; i < Time; ++i){" << endl;
+	file << "      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;" << endl;
+	file << "		agent->x = x1;" << endl;
+	file << "       agent->y = y1;" << endl;
+	file << "       agent->z = z1;" << endl;
+	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
+	file << " }" << endl;
+	file << " }" << endl;
+	file << " agent->type++;" << endl;
 	file << endl << "return 0;" << endl;
 
 	file << "}" << endl;
@@ -305,6 +323,7 @@ void receive_bind_function(string agent){
 	file << " xmachine_message_bind" << agent << "* current_message = get_first_bind" << agent << "_message(bind" << agent << "_messages, partition_matrix, agent->x, agent->y, agent->z);" << endl << endl;
 	file << "  while (current_message)" << endl;
 	file << "   {" << endl;
+	file << "            if (agent->type >= 10){" << endl;
 	file << "     if (current_message->id != agent->id){" << endl;
 	file << "        if (agent->id == current_message->closest_id){" << endl;
 	file << "           if (c == 0){" << endl;
@@ -318,6 +337,7 @@ void receive_bind_function(string agent){
 	file << "             }" << endl;
 	file << "         }" << endl;
 	file << "      }" << endl;
+	file << "    }" << endl;
 	file << "   current_message = get_next_bind" << agent << "_message(current_message, bind" << agent << "_messages, partition_matrix);" << endl << endl;
 	file << "   }" << endl;
 	file << " if (c == 1) {" << endl;
@@ -383,7 +403,8 @@ void need_location_function(string agent, string master){
 
 	file << "  while (current_message)" << endl;
 	file << "   {" << endl;
-	file << "     if (current_message->id != agent->id){" << endl;
+	file << "     if (agent->type >= 10){" << endl;
+	file << "      if (current_message->id != agent->id){" << endl;
 
 	file << "           x2 = current_message->x;" << endl;
 	file << "	        y2 = current_message->y;" << endl;
@@ -400,8 +421,8 @@ void need_location_function(string agent, string master){
 	file << "                        nearest_id = current_message->id;" << endl;
 	file << "                     }" << endl;
 	file << "                  }" << endl;
-	
 	file << "             }" << endl;
+	file << "          }" << endl;
 	file << "   current_message = get_next_location" << agent << "_message(current_message, location" << agent << "_messages, partition_matrix);" << endl << endl;
 	file << "   }" << endl;
 	file << " if (c == 1) {" << endl;

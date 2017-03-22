@@ -9,7 +9,8 @@
 #define ZMAX		  	10.0f
 //Interaction radius
 #define radius 1.0f
-#define SPEED 0.005f
+#define Time 10
+#define SPEED 0.0007f
 
 std::vector<int>Acounter;
 std::vector<int>Bcounter;
@@ -47,7 +48,7 @@ fflush(stdout);
 */
 __FLAME_GPU_EXIT_FUNC__ void exitFunction(){
 
-FILE *output = fopen("C:\\FLAMEGPU\\examples\\Abstract_Model\\output.dat",  "w");
+FILE *output = fopen("output.dat",  "w");
 
 fprintf(output, "#IA B C \n ");
 
@@ -66,28 +67,45 @@ __FLAME_GPU_FUNC__ int move_A(xmachine_memory_A* agent, RNG_rand48* rand48){
   float z1 = agent->z;
   float random = rnd(rand48);
    if (random < 0.1f) {
-		x1 = x1 <= 0.0 ? 0.0 : x1 - SPEED;
- }
-	else if (random < 0.2f) {
-      x1 = x1 >= XMAX ? XMAX : x1 + SPEED;
- }
-	else if (random < 0.3f) {
-      y1 = y1 >= YMAX ? YMAX : y1 + SPEED;
- }
-	else if (random < 0.4f){
-      y1 = y1 <= 0.0 ? 0.0 : y1 - SPEED;
- }
-   else if (random < 0.5f) {
-	   z1 = z1 >= ZMAX ? ZMAX : z1 + SPEED;
- }
-   else  if (random < 0.6f){
-    z1 = z1 <= 0.0 ? 0.0 : z1 - SPEED;
- }
-/* update memory with new parameters*/
+for (int i = 0; i < Time; ++i){
+		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;
 		agent->x = x1;
        agent->y = y1;
        agent->z = z1;
        agent->state = AGENT_STATE_A_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random <= 0.5f){
+for (int i = 0; i < Time; ++i){
+      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_A_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random < 0.72f){
+for (int i = 0; i < Time; ++i){
+      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_A_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random < 0.92f){
+for (int i = 0; i < Time; ++i){
+      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_A_DEFAULT;
+ }
+ }
+ agent->type++;
 
 return 0;
 }
@@ -109,28 +127,45 @@ __FLAME_GPU_FUNC__ int move_B(xmachine_memory_B* agent, RNG_rand48* rand48){
   float z1 = agent->z;
   float random = rnd(rand48);
    if (random < 0.1f) {
-		x1 = x1 <= 0.0 ? 0.0 : x1 - SPEED;
- }
-	else if (random < 0.2f) {
-      x1 = x1 >= XMAX ? XMAX : x1 + SPEED;
- }
-	else if (random < 0.3f) {
-      y1 = y1 >= YMAX ? YMAX : y1 + SPEED;
- }
-	else if (random < 0.4f){
-      y1 = y1 <= 0.0 ? 0.0 : y1 - SPEED;
- }
-   else if (random < 0.5f) {
-	   z1 = z1 >= ZMAX ? ZMAX : z1 + SPEED;
- }
-   else  if (random < 0.6f){
-    z1 = z1 <= 0.0 ? 0.0 : z1 - SPEED;
- }
-/* update memory with new parameters*/
+for (int i = 0; i < Time; ++i){
+		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;
 		agent->x = x1;
        agent->y = y1;
        agent->z = z1;
        agent->state = AGENT_STATE_B_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random <= 0.5f){
+for (int i = 0; i < Time; ++i){
+      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_B_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random < 0.72f){
+for (int i = 0; i < Time; ++i){
+      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_B_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random < 0.92f){
+for (int i = 0; i < Time; ++i){
+      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_B_DEFAULT;
+ }
+ }
+ agent->type++;
 
 return 0;
 }
@@ -164,6 +199,7 @@ __FLAME_GPU_FUNC__ int receive_bindB(xmachine_memory_B* agent, xmachine_message_
 
   while (current_message)
    {
+            if (agent->type >= 10){
      if (current_message->id != agent->id){
         if (agent->id == current_message->closest_id){
            if (c == 0){
@@ -177,6 +213,7 @@ __FLAME_GPU_FUNC__ int receive_bindB(xmachine_memory_B* agent, xmachine_message_
              }
          }
       }
+    }
    current_message = get_next_bindB_message(current_message, bindB_messages, partition_matrix);
 
    }
@@ -225,7 +262,8 @@ xmachine_message_locationB* current_message = get_first_locationB_message(locati
 
   while (current_message)
    {
-     if (current_message->id != agent->id){
+     if (agent->type >= 10){
+      if (current_message->id != agent->id){
            x2 = current_message->x;
 	        y2 = current_message->y;
 	        z2 = current_message->z;
@@ -242,6 +280,7 @@ xmachine_message_locationB* current_message = get_first_locationB_message(locati
                      }
                   }
              }
+          }
    current_message = get_next_locationB_message(current_message, locationB_messages, partition_matrix);
 
    }
@@ -311,28 +350,45 @@ __FLAME_GPU_FUNC__ int move_C(xmachine_memory_C* agent, RNG_rand48* rand48){
   float z1 = agent->z;
   float random = rnd(rand48);
    if (random < 0.1f) {
-		x1 = x1 <= 0.0 ? 0.0 : x1 - SPEED;
- }
-	else if (random < 0.2f) {
-      x1 = x1 >= XMAX ? XMAX : x1 + SPEED;
- }
-	else if (random < 0.3f) {
-      y1 = y1 >= YMAX ? YMAX : y1 + SPEED;
- }
-	else if (random < 0.4f){
-      y1 = y1 <= 0.0 ? 0.0 : y1 - SPEED;
- }
-   else if (random < 0.5f) {
-	   z1 = z1 >= ZMAX ? ZMAX : z1 + SPEED;
- }
-   else  if (random < 0.6f){
-    z1 = z1 <= 0.0 ? 0.0 : z1 - SPEED;
- }
-/* update memory with new parameters*/
+for (int i = 0; i < Time; ++i){
+		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;
 		agent->x = x1;
        agent->y = y1;
        agent->z = z1;
        agent->state = AGENT_STATE_C_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random <= 0.5f){
+for (int i = 0; i < Time; ++i){
+      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_C_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random < 0.72f){
+for (int i = 0; i < Time; ++i){
+      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_C_DEFAULT;
+ }
+ }
+random = rnd(rand48);
+	    if (random < 0.92f){
+for (int i = 0; i < Time; ++i){
+      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;
+		agent->x = x1;
+       agent->y = y1;
+       agent->z = z1;
+       agent->state = AGENT_STATE_C_DEFAULT;
+ }
+ }
+ agent->type++;
 
 return 0;
 }
