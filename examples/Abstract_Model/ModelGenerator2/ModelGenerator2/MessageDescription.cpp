@@ -54,7 +54,7 @@ void MessageDescription::outputXML(std::ofstream &outfile, XmlWriter &xml){
 
 	xml.writeOpenTag(outfile, "gpu:partitioningSpatial");
 	xml.writeStartElementTag(outfile, "gpu:radius");
-	xml.writeString(outfile, "1.0");
+	xml.writeString(outfile, "0.25");
 	xml.writeEndElementTag(outfile);
 	xml.writeStartElementTag(outfile, "gpu:xmin");
 	xml.writeString(outfile, "0.0");

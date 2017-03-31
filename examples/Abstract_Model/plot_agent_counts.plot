@@ -1,7 +1,14 @@
 #This is a GNU plot script for agent outputs
-set title "Agent population counts for A+B=C," 
+set   autoscale                        # scale axes automatically
+unset log                              # remove any log-scaling
+unset label                            # remove any previous labels
+set xtic auto                          # set xtics automatically
+set ytic auto                          # set ytics automatically
+set title "Agent population counts for A+B=C" 
 set xlabel "Iteration number" 
 set ylabel "Agent Population Count" 
-plot "output.dat" using 1:2 title 'A', \
-     "output.dat" using 1:3 title 'B', \
-     "output.dat" using 1:4 title 'C'
+set xr [8:50]
+set yr [0:100]
+plot "output.dat" using 1:2 title 'Agent A', \
+     "output.dat" using 1:3 title 'Agent B', \
+     "output.dat" using 1:4 title 'Agent C',

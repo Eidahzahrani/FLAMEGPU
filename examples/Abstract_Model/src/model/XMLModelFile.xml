@@ -35,6 +35,10 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			</gpu:variable>
 			<gpu:variable>
 				<type>int</type>
+				<name>count</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>int</type>
 				<name>id</name>
 			</gpu:variable>
 			<gpu:variable>
@@ -44,6 +48,18 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			<gpu:variable>
 				<type>int</type>
 				<name>type</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vx</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vy</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vz</name>
 			</gpu:variable>
 			<gpu:variable>
 				<type>float</type>
@@ -169,6 +185,10 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			</gpu:variable>
 			<gpu:variable>
 				<type>int</type>
+				<name>count</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>int</type>
 				<name>id</name>
 			</gpu:variable>
 			<gpu:variable>
@@ -178,6 +198,18 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			<gpu:variable>
 				<type>int</type>
 				<name>type</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vx</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vy</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vz</name>
 			</gpu:variable>
 			<gpu:variable>
 				<type>float</type>
@@ -273,6 +305,10 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			</gpu:variable>
 			<gpu:variable>
 				<type>int</type>
+				<name>count</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>int</type>
 				<name>id</name>
 			</gpu:variable>
 			<gpu:variable>
@@ -282,6 +318,18 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			<gpu:variable>
 				<type>int</type>
 				<name>type</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vx</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vy</name>
+			</gpu:variable>
+			<gpu:variable>
+				<type>float</type>
+				<name>vz</name>
 			</gpu:variable>
 			<gpu:variable>
 				<type>float</type>
@@ -353,7 +401,7 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			</gpu:variable>
 		</variables>
 		<gpu:partitioningSpatial>
-			<gpu:radius>1.0</gpu:radius>
+			<gpu:radius>0.25</gpu:radius>
 			<gpu:xmin>0.0</gpu:xmin>
 			<gpu:xmax>10.0</gpu:xmax>
 			<gpu:ymin>0.0</gpu:ymin>
@@ -400,7 +448,7 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			</gpu:variable>
 		</variables>
 		<gpu:partitioningSpatial>
-			<gpu:radius>1.0</gpu:radius>
+			<gpu:radius>0.25</gpu:radius>
 			<gpu:xmin>0.0</gpu:xmin>
 			<gpu:xmax>10.0</gpu:xmax>
 			<gpu:ymin>0.0</gpu:ymin>
@@ -447,7 +495,7 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
 			</gpu:variable>
 		</variables>
 		<gpu:partitioningSpatial>
-			<gpu:radius>1.0</gpu:radius>
+			<gpu:radius>0.25</gpu:radius>
 			<gpu:xmin>0.0</gpu:xmin>
 			<gpu:xmax>10.0</gpu:xmax>
 			<gpu:ymin>0.0</gpu:ymin>

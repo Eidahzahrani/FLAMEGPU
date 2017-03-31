@@ -1,16 +1,24 @@
-#ifndef _FLAMEGPU_FUNCTIONS
-#define _FLAMEGPU_FUNCTIONS
+/*
+*
+* Functions.c for The Benchmark Model.
+*
+* Author: Eidah Alzahrani
+*
+*/
 #include <header.h>
 #include <vector>
+
+#ifndef _FLAMEGPU_FUNCTIONS
+#define _FLAMEGPU_FUNCTIONS
 #define AGENT_STATE_DEAD 3
 #define AGENT_STATE_BIND 2
 #define XMAX 		10.0f
 #define YMAX		  	10.0f
 #define ZMAX		  	10.0f
-//Interaction radius
-#define radius 1.0f
-#define Time 10
-#define SPEED 0.0007f
+#define radius 0.10f//Interaction radius
+#define DT 0.01
+#define MOVEMENT_TIME_RANGE 15//by increasing this we will make agents move across a larger amount of area and increase the chance that they will be within range of another agent to interact with
+#define MIN_MOVEMENT_TIME 5
 
 std::vector<int>Acounter;
 std::vector<int>Bcounter;
@@ -62,50 +70,49 @@ fclose(output);
 */
 __FLAME_GPU_FUNC__ int move_A(xmachine_memory_A* agent, RNG_rand48* rand48){
 
-  float x1 = agent->x;
-  float y1 = agent->y;
-  float z1 = agent->z;
-  float random = rnd(rand48);
-   if (random < 0.1f) {
-for (int i = 0; i < Time; ++i){
-		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
+  float vx;
+  float vy;
+  float vz;
+
+  float x = agent->x;
+  float y = agent->y;
+  float z = agent->z;
+
+  //generate a new direction by creating a new random velocity
+   if (agent->count == 0) {
+      float r_x = (rnd(rand48) - 0.5f)*2.0f;
+	   float r_y = (rnd(rand48) - 0.5f)*2.0f;
+	   float r_z = (rnd(rand48) - 0.5f)*2.0f;
+
+      agent->vx = r_x;
+      agent->vy = r_y;
+      agent->vz = r_z;
+
+      agent->count = (int)(rnd(rand48)*(float)MOVEMENT_TIME_RANGE) + MIN_MOVEMENT_TIME;
+ }
+  //get the velocity
+      vx=agent->vx ;
+      vy=agent->vy ;
+      vz=agent->vz ;
+
+  //move according to velocity
+      x = x + vx*DT;
+      y = y + vy*DT;
+      z = z + vz*DT;
+
+//(Clamp position to environment)
+   x = x >= XMAX ? XMAX : x;
+   x = x <= 0.0 ? 0.0 : x;
+   y = y >= YMAX ? YMAX : y;
+   y = y <= 0.0 ? 0.0 : y;
+   z = z >= ZMAX ? ZMAX : z;
+   z = z <= 0.0 ? 0.0 : z;
+
+		agent->x = x;
+       agent->y = y;
+       agent->z = z;
+       agent->count--;
        agent->state = AGENT_STATE_A_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random <= 0.5f){
-for (int i = 0; i < Time; ++i){
-      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_A_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random < 0.72f){
-for (int i = 0; i < Time; ++i){
-      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_A_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random < 0.92f){
-for (int i = 0; i < Time; ++i){
-      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_A_DEFAULT;
- }
- }
- agent->type++;
 
 return 0;
 }
@@ -122,50 +129,49 @@ __FLAME_GPU_FUNC__ int death_A(xmachine_memory_A* agent){
 */
 __FLAME_GPU_FUNC__ int move_B(xmachine_memory_B* agent, RNG_rand48* rand48){
 
-  float x1 = agent->x;
-  float y1 = agent->y;
-  float z1 = agent->z;
-  float random = rnd(rand48);
-   if (random < 0.1f) {
-for (int i = 0; i < Time; ++i){
-		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
+  float vx;
+  float vy;
+  float vz;
+
+  float x = agent->x;
+  float y = agent->y;
+  float z = agent->z;
+
+  //generate a new direction by creating a new random velocity
+   if (agent->count == 0) {
+      float r_x = (rnd(rand48) - 0.5f)*2.0f;
+	   float r_y = (rnd(rand48) - 0.5f)*2.0f;
+	   float r_z = (rnd(rand48) - 0.5f)*2.0f;
+
+      agent->vx = r_x;
+      agent->vy = r_y;
+      agent->vz = r_z;
+
+      agent->count = (int)(rnd(rand48)*(float)MOVEMENT_TIME_RANGE) + MIN_MOVEMENT_TIME;
+ }
+  //get the velocity
+      vx=agent->vx ;
+      vy=agent->vy ;
+      vz=agent->vz ;
+
+  //move according to velocity
+      x = x + vx*DT;
+      y = y + vy*DT;
+      z = z + vz*DT;
+
+//(Clamp position to environment)
+   x = x >= XMAX ? XMAX : x;
+   x = x <= 0.0 ? 0.0 : x;
+   y = y >= YMAX ? YMAX : y;
+   y = y <= 0.0 ? 0.0 : y;
+   z = z >= ZMAX ? ZMAX : z;
+   z = z <= 0.0 ? 0.0 : z;
+
+		agent->x = x;
+       agent->y = y;
+       agent->z = z;
+       agent->count--;
        agent->state = AGENT_STATE_B_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random <= 0.5f){
-for (int i = 0; i < Time; ++i){
-      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_B_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random < 0.72f){
-for (int i = 0; i < Time; ++i){
-      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_B_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random < 0.92f){
-for (int i = 0; i < Time; ++i){
-      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_B_DEFAULT;
- }
- }
- agent->type++;
 
 return 0;
 }
@@ -199,7 +205,6 @@ __FLAME_GPU_FUNC__ int receive_bindB(xmachine_memory_B* agent, xmachine_message_
 
   while (current_message)
    {
-            if (agent->type >= 10){
      if (current_message->id != agent->id){
         if (agent->id == current_message->closest_id){
            if (c == 0){
@@ -212,7 +217,6 @@ __FLAME_GPU_FUNC__ int receive_bindB(xmachine_memory_B* agent, xmachine_message_
                  nearest_id = current_message->id;
              }
          }
-      }
     }
    current_message = get_next_bindB_message(current_message, bindB_messages, partition_matrix);
 
@@ -262,7 +266,6 @@ xmachine_message_locationB* current_message = get_first_locationB_message(locati
 
   while (current_message)
    {
-     if (agent->type >= 10){
       if (current_message->id != agent->id){
            x2 = current_message->x;
 	        y2 = current_message->y;
@@ -279,7 +282,6 @@ xmachine_message_locationB* current_message = get_first_locationB_message(locati
                         nearest_id = current_message->id;
                      }
                   }
-             }
           }
    current_message = get_next_locationB_message(current_message, locationB_messages, partition_matrix);
 
@@ -336,7 +338,7 @@ c++;
          }
          if(c >= 1) {
         agent->state = 6;
-        add_C_agent(C_agents, 0.0, 0, agent->id,  AGENT_STATE_C_DEFAULT, 1 ,agent->x, agent->y, agent->z );
+        add_C_agent(C_agents, 0.0, 0, agent->count, agent->id,  AGENT_STATE_C_DEFAULT, 1 ,agent->vx, agent->vy, agent->vz, agent->x, agent->y, agent->z );
     }
      return 0;
   }
@@ -345,50 +347,49 @@ c++;
 */
 __FLAME_GPU_FUNC__ int move_C(xmachine_memory_C* agent, RNG_rand48* rand48){
 
-  float x1 = agent->x;
-  float y1 = agent->y;
-  float z1 = agent->z;
-  float random = rnd(rand48);
-   if (random < 0.1f) {
-for (int i = 0; i < Time; ++i){
-		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
+  float vx;
+  float vy;
+  float vz;
+
+  float x = agent->x;
+  float y = agent->y;
+  float z = agent->z;
+
+  //generate a new direction by creating a new random velocity
+   if (agent->count == 0) {
+      float r_x = (rnd(rand48) - 0.5f)*2.0f;
+	   float r_y = (rnd(rand48) - 0.5f)*2.0f;
+	   float r_z = (rnd(rand48) - 0.5f)*2.0f;
+
+      agent->vx = r_x;
+      agent->vy = r_y;
+      agent->vz = r_z;
+
+      agent->count = (int)(rnd(rand48)*(float)MOVEMENT_TIME_RANGE) + MIN_MOVEMENT_TIME;
+ }
+  //get the velocity
+      vx=agent->vx ;
+      vy=agent->vy ;
+      vz=agent->vz ;
+
+  //move according to velocity
+      x = x + vx*DT;
+      y = y + vy*DT;
+      z = z + vz*DT;
+
+//(Clamp position to environment)
+   x = x >= XMAX ? XMAX : x;
+   x = x <= 0.0 ? 0.0 : x;
+   y = y >= YMAX ? YMAX : y;
+   y = y <= 0.0 ? 0.0 : y;
+   z = z >= ZMAX ? ZMAX : z;
+   z = z <= 0.0 ? 0.0 : z;
+
+		agent->x = x;
+       agent->y = y;
+       agent->z = z;
+       agent->count--;
        agent->state = AGENT_STATE_C_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random <= 0.5f){
-for (int i = 0; i < Time; ++i){
-      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_C_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random < 0.72f){
-for (int i = 0; i < Time; ++i){
-      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_C_DEFAULT;
- }
- }
-random = rnd(rand48);
-	    if (random < 0.92f){
-for (int i = 0; i < Time; ++i){
-      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;
-		agent->x = x1;
-       agent->y = y1;
-       agent->z = z1;
-       agent->state = AGENT_STATE_C_DEFAULT;
- }
- }
- agent->type++;
 
 return 0;
 }

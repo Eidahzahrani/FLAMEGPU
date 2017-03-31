@@ -38,6 +38,11 @@ void Create_Plot(FileModel model){
 	}
 	else {
 		File << "#This is a GNU plot script for agent outputs" << endl;
+		File << "set   autoscale                        # scale axes automatically " << endl;
+		File << "unset log                              # remove any log-scaling " << endl;
+		File << "unset label                            # remove any previous labels " << endl;
+		File << "set xtic auto                          # set xtics automatically " << endl;
+		File << "set ytic auto                          # set ytics automatically " << endl;
 		File << "set title ""\"Agent population counts for ";
 		Lines = model.getlines();
 		int size = Lines.size();
@@ -45,38 +50,40 @@ void Create_Plot(FileModel model){
 		for (int i = 0; i < size; i++){
 			title(Lines[i]);
 		}
-		
-		File << "\" "<<endl;
+
+		File << "\" " << endl;
 		File << "set xlabel ""\"Iteration number" << "\" " << endl;
 		File << "set ylabel ""\"Agent Population Count" << "\" " << endl;
+		File << "set xr [0:50] "<<endl;
+		File << "set yr [0:100] "<<endl;
 		File << "plot ";
-		for (int j = 0;j < size; j++){
+		for (int j = 0; j < size; j++){
 			agent1 = Lines[j].getMaster();
-			File << """\"output.dat" << "\" " << "using 1:" << counter << " title '" << agent1.getName()<< "', \\" << endl;
+			File << """\"output.dat" << "\" " << "using 1:" << counter << " title '" << agent1.getName() << "', \\" << endl;
 			counter++;
 			slaveagent = Lines[j].getSlaves();
-			 int z1 = slaveagent.size();
-			 cout << z1;
-		for (int i = 0; i < z1; i++){
+			int z1 = slaveagent.size();
 			
-			File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << slaveagent[i] << "', \\" << endl;
-			counter++;
-		}
-		combindagent = Lines[j].getCombined();
-		int z2 = combindagent.size();
-		cout << "z2" << z2;
-		for (int i = 0; i < z2; i++){
-			if (j==Lines.size()-1)
-				File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "'," << endl;
-			else
-				File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "', \\" << endl;
-			counter++;
-		}
-	
+			for (int i = 0; i < z1; i++){
+
+				File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << slaveagent[i] << "', \\" << endl;
+				counter++;
+			}
+			combindagent = Lines[j].getCombined();
+			int z2 = combindagent.size();
+		
+			for (int i = 0; i < z2; i++){
+				if (j == Lines.size() - 1)
+					File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "'," << endl;
+				else
+					File << "    ""\"output.dat" << "\" " << "using 1:" << counter << " title '" << combindagent[i] << "', \\" << endl;
+				counter++;
+			}
+
 		}
 
 	}
-
+	cout << "Plot_agent_counts File was Created.." << endl;
 	File.close();// close the file 
 
 }

@@ -53,10 +53,9 @@ void addModel_Functions(FileModel m){
 		exitfunction(m);
 		lines = m.getlines();
 		int size = lines.size();
-		cout<< "size lines:" << size;
+		
 		for (int i = 0; i < size; i++){
-			cout << "here";
-			cout << "line number" << i + 1 << ":";
+		
 			l = lines[i];
 			agent = l.getMaster();
 			master = agent.getName();
@@ -76,19 +75,20 @@ void addModel_Functions(FileModel m){
 				created_function(Combindagent[0].getName(), master, s, i);
 
 			}
+
+
+
+			s = Combindagent[0].getName();
+			move_function(s);
+
+
 			
-		
-		
-				s = Combindagent[0].getName();
-				move_function(s);
-				
-		
-			cout << "exit from here" << endl;
 		}
-		cout << "exit"<<endl;
+	
 	}
-	cout << "exit2";
+
 	file << "#endif //_FLAMEGPU_FUNCTIONS" << endl;
+	cout << "Functionc.c was Created.." << endl;
 	file.close();// close the file 
 
 
@@ -98,21 +98,29 @@ void addModel_Functions(FileModel m){
 
 void define_state(FileModel m){
 	std::vector<string>agents;
+
+	file << "/*" << endl;
+	file << "*" << endl;
+	file << "* Functions.c for The Benchmark Model." << endl;
+	file << "*" << endl;
+	file << "* Author: Eidah Alzahrani" << endl;
+	file << "*" << endl;
+	file << "*/" << endl;
+	file << "#include <header.h>" << endl;
+	file << "#include <vector>" << endl<<endl;
 	file << "#ifndef _FLAMEGPU_FUNCTIONS" << endl;
 	file << "#define _FLAMEGPU_FUNCTIONS" << endl;
-	file << "#include <header.h>" << endl;
-	file << "#include <vector>" << endl;
 	file << "#define AGENT_STATE_DEAD 3" << endl;
 	file << "#define AGENT_STATE_BIND 2" << endl;
 
 	file << "#define XMAX 		10.0f" << endl;
 	file << "#define YMAX		  	10.0f" << endl;
 	file << "#define ZMAX		  	10.0f" << endl;
-	file << "//Interaction radius" << endl;
-	file << "#define radius 1.0f" << endl;
-	file << "#define Time 10" << endl;
-	file << "#define SPEED 0.0007f" << endl << endl;;
-	
+	file << "#define radius 0.10f" << "//Interaction radius" << endl;
+	file << "#define DT 0.01" << endl;
+	file << "#define MOVEMENT_TIME_RANGE 15" <<"//by increasing this we will make agents move across a larger amount of area and increase the chance that they will be within range of another agent to interact with" << endl;
+	file << "#define MIN_MOVEMENT_TIME 5" << endl << endl;;
+
 	agents = m.getUniqueAgents();
 	int size = agents.size();
 	for (int i = 0; i < size; i++){
@@ -122,9 +130,9 @@ void define_state(FileModel m){
 	file << "unsigned int h_iteration = 0;" << endl;
 	lines = m.getlines();
 	int size1 = lines.size();
-	
+
 	for (int i = 0; i < size1; i++){
-		cout << "line number" << i + 1 << ":";
+		//cout << "line number" << i + 1 << ":";
 		l = lines[i];
 		agent = l.getMaster();
 		master = agent.getName();
@@ -166,11 +174,11 @@ void initfunction(FileModel m){
 
 		//file << "printf(\"FLAME GPU Init function." << s[i] << " population is (%d)\n\"" << ", get_agent_" << s[i] << "_moving_" << s[i] << "_count());" << endl;
 		file << s[i] << "counter.push_back(get_agent_" << s[i] << "_moving_" << s[i] << "_count());" << endl;
-		 }
-		file << "iteration.push_back(0);" << endl;
-		file << "fflush(stdout);" << endl;
-		file << " }" << endl;
-	
+	}
+	file << "iteration.push_back(0);" << endl;
+	file << "fflush(stdout);" << endl;
+	file << " }" << endl;
+
 }
 //-------------------------------------------------------------
 //== Function Name  : 
@@ -186,8 +194,8 @@ void stepfunction(FileModel m){
 	file << "h_iteration++;" << endl;
 	file << "iteration.push_back(h_iteration);" << endl;
 	for (int i = 0; i<size; i++){
-		
-		file << s[i]<<"counter.push_back(get_agent_" << s[i] << "_moving_" << s[i] << "_count());" << endl;
+
+		file << s[i] << "counter.push_back(get_agent_" << s[i] << "_moving_" << s[i] << "_count());" << endl;
 	}
 	file << "fflush(stdout);" << endl;
 	file << "}" << endl;
@@ -199,7 +207,7 @@ void exitfunction(FileModel m){
 	file << "/*" << endl;
 	file << " *Exit_Function....." << endl;
 	file << "*/" << endl;
-	file << "__FLAME_GPU_EXIT_FUNC__ void exitFunction(){" << endl << endl; 
+	file << "__FLAME_GPU_EXIT_FUNC__ void exitFunction(){" << endl << endl;
 	file << "FILE *output = fopen(" << "\"output.dat""\",  ""\"w""\");" << endl << endl;
 
 	file << "fprintf(output, ""\"#I";
@@ -207,24 +215,24 @@ void exitfunction(FileModel m){
 	s = m.getUniqueAgents();
 	int size = s.size();
 	for (int i = 0; i < size; i++){
-		file << s[i] << " "; 
+		file << s[i] << " ";
 	}
-	file<<"\\n ""\");" << endl << endl;
+	file << "\\n ""\");" << endl << endl;
 	file << "for (int i = 0; i < h_iteration; i++){" << endl;
 
 	file << "fprintf(output, ""\"%u ";
 	for (int i = 0; i < size; i++){
 		file << "%d" << " ";
 	}
-		file << "\\n ""\", iteration[i],";
-		for (int i = 0; i < size; i++){
-			cout << i << "--" << size;
-			if (i == size-1)file << s[i] << "counter[i]";
-			else
-			file <<s[i]<< "counter[i]" << ", ";
-		}
+	file << "\\n ""\", iteration[i],";
+	for (int i = 0; i < size; i++){
+		//cout << i << "--" << size;
+		if (i == size - 1)file << s[i] << "counter[i]";
+		else
+			file << s[i] << "counter[i]" << ", ";
+	}
 
-		file<<");" << endl;
+	file << ");" << endl;
 	file << "}" << endl;
 	file << "fclose(output);" << endl;
 	file << "}" << endl;
@@ -237,55 +245,47 @@ void move_function(string agent){
 	file << " * move_" << agent << " FLAMEGPU Agent Function" << endl;
 	file << "*/" << endl;
 	file << "__FLAME_GPU_FUNC__ int move_" << agent << "(xmachine_memory_" << agent << "* agent, RNG_rand48* rand48){" << endl << endl;
-	file << "  float x1 = agent->x;" << endl;
-	file << "  float y1 = agent->y;" << endl;
-	file << "  float z1 = agent->z;" << endl;
-	file << "  float random = rnd(rand48);" << endl;
-	file << "   if (random < 0.1f) {" << endl;
-	file << "for (int i = 0; i < Time; ++i){" << endl;
-	file << "		y1 = y1 >= YMAX ? YMAX : y1 + 0.0004f;" << endl;
-	file << "		agent->x = x1;" << endl;
-	file << "       agent->y = y1;" << endl;
-	file << "       agent->z = z1;" << endl;
+	file << "  float vx;" << endl;
+	file << "  float vy;" << endl;
+	file << "  float vz;" << endl<<endl;
+	file << "  float x = agent->x;" << endl;
+	file << "  float y = agent->y;" << endl;
+	file << "  float z = agent->z;" << endl << endl;
+	file << "  //generate a new direction by creating a new random velocity" <<endl;
+	file << "   if (agent->count == 0) {" << endl;
+	file << "      float r_x = (rnd(rand48) - 0.5f)*2.0f;" << endl;
+	file << "	   float r_y = (rnd(rand48) - 0.5f)*2.0f;" << endl;
+	file << "	   float r_z = (rnd(rand48) - 0.5f)*2.0f;" << endl<<endl;
+	file << "      agent->vx = r_x;" << endl;
+	file << "      agent->vy = r_y;" << endl;
+	file << "      agent->vz = r_z;" << endl<<endl;
+	file << "      agent->count = (int)(rnd(rand48)*(float)MOVEMENT_TIME_RANGE) + MIN_MOVEMENT_TIME;" << endl;
+	file << " }" << endl;
+	file << "  //get the velocity" << endl;
+	file << "      vx=agent->vx ;" << endl;
+	file << "      vy=agent->vy ;" << endl;
+	file << "      vz=agent->vz ;" << endl << endl;
+	file << "  //move according to velocity" << endl;
+	file << "      x = x + vx*DT;" << endl;
+	file << "      y = y + vy*DT;" << endl;
+	file << "      z = z + vz*DT;" << endl << endl;
+	file << "//(Clamp position to environment)" << endl;
+	file << "   x = x >= XMAX ? XMAX : x;" << endl;
+	file << "   x = x <= 0.0 ? 0.0 : x;" << endl;
+	file << "   y = y >= YMAX ? YMAX : y;" << endl;
+	file << "   y = y <= 0.0 ? 0.0 : y;" << endl;
+	file << "   z = z >= ZMAX ? ZMAX : z;" << endl;
+	file << "   z = z <= 0.0 ? 0.0 : z;" <<endl<< endl;
+	file << "		agent->x = x;" << endl;
+	file << "       agent->y = y;" << endl;
+	file << "       agent->z = z;" << endl;
+	file << "       agent->count--;" << endl;
 	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
-	file << " }" << endl;
-	file << " }" << endl;
-	file << "random = rnd(rand48);" << endl;
-	file << "	    if (random <= 0.5f){" << endl;
-	file << "for (int i = 0; i < Time; ++i){" << endl;
-	file << "      y1 = y1 <= 0.0 ? 0.0 : y1 - 0.0005f;" << endl;
-	file << "		agent->x = x1;" << endl;
-	file << "       agent->y = y1;" << endl;
-	file << "       agent->z = z1;" << endl;
-	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
-	file << " }" << endl;
-	file << " }" << endl;
-	file << "random = rnd(rand48);" << endl;
-	file << "	    if (random < 0.72f){" << endl;
-	file << "for (int i = 0; i < Time; ++i){" << endl;
-	file << "      x1 = x1 >= XMAX ? XMAX : x1 + 0.0003f;" << endl;
-	file << "		agent->x = x1;" << endl;
-	file << "       agent->y = y1;" << endl;
-	file << "       agent->z = z1;" << endl;
-	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
-	file << " }" << endl;
-	file << " }" << endl;
-	file << "random = rnd(rand48);" << endl;
-	file << "	    if (random < 0.92f){" << endl;
-	file << "for (int i = 0; i < Time; ++i){" << endl;
-	file << "      x1 = x1 <= 0.0 ? 0.0 : x1 - 0.0004f;" << endl;
-	file << "		agent->x = x1;" << endl;
-	file << "       agent->y = y1;" << endl;
-	file << "       agent->z = z1;" << endl;
-	file << "       agent->state = AGENT_STATE_" << agent << "_DEFAULT;" << endl;
-	file << " }" << endl;
-	file << " }" << endl;
-	file << " agent->type++;" << endl;
+	//file << "       agent->type++;" << endl;
 	file << endl << "return 0;" << endl;
 
 	file << "}" << endl;
 
-	cout << "move:" << agent << endl;
 }
 //-------------------------------------------------------------
 //== Function Name  : 
@@ -308,7 +308,6 @@ void send_location_function(string agent){
 	file << endl << "return 0;" << endl;
 	file << "}" << endl << endl;
 
-	cout << "sendLocation:" << agent << endl;
 }
 //-------------------------------------------------------------
 //== Function Name  : 
@@ -323,7 +322,7 @@ void receive_bind_function(string agent){
 	file << " xmachine_message_bind" << agent << "* current_message = get_first_bind" << agent << "_message(bind" << agent << "_messages, partition_matrix, agent->x, agent->y, agent->z);" << endl << endl;
 	file << "  while (current_message)" << endl;
 	file << "   {" << endl;
-	file << "            if (agent->type >= 10){" << endl;
+	//file << "            if (agent->type >= 10){" << endl;
 	file << "     if (current_message->id != agent->id){" << endl;
 	file << "        if (agent->id == current_message->closest_id){" << endl;
 	file << "           if (c == 0){" << endl;
@@ -336,7 +335,7 @@ void receive_bind_function(string agent){
 	file << "                 nearest_id = current_message->id;" << endl;
 	file << "             }" << endl;
 	file << "         }" << endl;
-	file << "      }" << endl;
+	//file << "      }" << endl;
 	file << "    }" << endl;
 	file << "   current_message = get_next_bind" << agent << "_message(current_message, bind" << agent << "_messages, partition_matrix);" << endl << endl;
 	file << "   }" << endl;
@@ -351,7 +350,6 @@ void receive_bind_function(string agent){
 	file << "return 0;" << endl;
 	file << "}" << endl;
 
-	cout << "receveBined:" << agent << endl;
 
 
 }
@@ -363,24 +361,23 @@ void send_combined_function(string agent){
 	file << "/*" << endl;
 	file << " * send_combined" << agent << " FLAMEGPU Agent Function" << endl;
 	file << "*/" << endl;
-	file << "__FLAME_GPU_FUNC__ int send_combined" << agent << "(xmachine_memory_" << agent << "*  agent ,xmachine_message_combined"<<agent<<"_list* combined"<<agent<<"_messages){" << endl << endl;
-	
+	file << "__FLAME_GPU_FUNC__ int send_combined" << agent << "(xmachine_memory_" << agent << "*  agent ,xmachine_message_combined" << agent << "_list* combined" << agent << "_messages){" << endl << endl;
+
 
 	file << "int id, s, t, c_id;" << endl;
 	file << "float x, y, z, c_point;" << endl;
 	file << "id = agent->id;" << endl;
 	file << "x = agent->x;" << endl;
-	file << "y = agent->y;"<< endl;
+	file << "y = agent->y;" << endl;
 	file << "z = agent->z;" << endl;
 	file << "s = agent->state;" << endl;
 	file << "t = agent->type;" << endl;
 	file << "c_point = agent->closest_point;" << endl;
 	file << "c_id = agent->closest_id;" << endl;
 
-	file << "add_combined" << agent << "_message(combined" << agent <<"_messages, c_id ,c_point , id, s,t, x, y, z );" << endl;
+	file << "add_combined" << agent << "_message(combined" << agent << "_messages, c_id ,c_point , id, s,t, x, y, z );" << endl;
 	file << "return 1;" << endl;
 	file << "}" << endl;
-	cout << "send combined:" << agent << endl;
 }
 
 //-------------------------------------------------------------
@@ -403,7 +400,7 @@ void need_location_function(string agent, string master){
 
 	file << "  while (current_message)" << endl;
 	file << "   {" << endl;
-	file << "     if (agent->type >= 10){" << endl;
+	//file << "     if (agent->type >= 10){" << endl;
 	file << "      if (current_message->id != agent->id){" << endl;
 
 	file << "           x2 = current_message->x;" << endl;
@@ -421,7 +418,7 @@ void need_location_function(string agent, string master){
 	file << "                        nearest_id = current_message->id;" << endl;
 	file << "                     }" << endl;
 	file << "                  }" << endl;
-	file << "             }" << endl;
+	//file << "             }" << endl;
 	file << "          }" << endl;
 	file << "   current_message = get_next_location" << agent << "_message(current_message, location" << agent << "_messages, partition_matrix);" << endl << endl;
 	file << "   }" << endl;
@@ -435,8 +432,6 @@ void need_location_function(string agent, string master){
 	file << "   }" << endl << endl;
 	file << "return 0;" << endl;
 	file << "}" << endl;
-
-	cout << "needLocation:" << agent << endl;
 }
 //-------------------------------------------------------------
 //== Function Name  : 
@@ -459,7 +454,6 @@ void send_bind_function(string agent, string master){
 	file << "add_bind" << agent << "_message(bind" << agent << "_messages, c_id ,c_point , id, s,t, x, y, z );" << endl;
 	file << "return 0;" << endl;
 	file << "}" << endl;
-	cout << "send bind:" << agent << endl;
 
 }//-------------------------------------------------------------
 
@@ -470,36 +464,28 @@ void created_function(string agent, string master, string slave, int Slave_Numbe
 	file << " * created_" << agent << " FLAMEGPU Agent Function" << endl;
 	file << "*/" << endl;
 	file << "__FLAME_GPU_FUNC__ int created_" << agent << Slave_Number << "(xmachine_memory_" << master << "* agent, xmachine_memory_" << agent << "_list* " << agent << "_agents, xmachine_message_combined" << slave << "_list* combined" << slave << "_messages, xmachine_message_combined" << slave << "_PBM* partition_matrix, RNG_rand48* rand48){" << endl;
-	
-	file << "int c = 0;" << endl<<endl;
+
+	file << "int c = 0;" << endl << endl;
 	file << "  xmachine_message_combined" << slave << "* current_message = get_first_combined" << slave << "_message(combined" << slave << "_messages, partition_matrix, agent->x, agent->y, agent->z);" << endl << endl;
-
 	file << "  while (current_message)" << endl;
-		file << "  {" << endl;
-		file << "      if (current_message->id != agent->id){" << endl;
-
-			file << "      if (current_message->closest_id == agent->id) {" <<endl;	
-
-				file <<         "c++;" << endl; 
-
-				file << "     }" << endl;
-			file << "    else" << endl;
-				file << "    {" << endl;
-				file << "        current_message->state = AGENT_STATE_DEAD;" << endl;
-
-				file << "    }" << endl;
-
-			file << "    }" << endl;
-			file << "      current_message = get_next_combined" << slave << "_message(current_message, combined" << slave << "_messages, partition_matrix);" << endl;
-
-		file << "         }" << endl;
+	file << "  {" << endl;
+	file << "      if (current_message->id != agent->id){" << endl;
+	file << "      if (current_message->closest_id == agent->id) {" << endl;
+	file << "c++;" << endl;
+	file << "     }" << endl;
+	file << "    else" << endl;
+	file << "    {" << endl;
+	file << "        current_message->state = AGENT_STATE_DEAD;" << endl;
+	file << "    }" << endl;
+	file << "    }" << endl;
+	file << "      current_message = get_next_combined" << slave << "_message(current_message, combined" << slave << "_messages, partition_matrix);" << endl;
+	file << "         }" << endl;
 	file << "         if(c >= 1) {" << endl;
-		file << "        agent->state = 6;" << endl;
-		file << "        add_" << agent << "_agent(" << agent << "_agents, 0.0, 0, agent->id,  AGENT_STATE_" << agent << "_DEFAULT, 1 ,agent->x, agent->y, agent->z );" << endl;
-		file << "    }" << endl;
-		file << "     return 0;" << endl;
-		file << "  }" << endl;
-		cout << "created:" << agent << "for slave"<<slave<<endl;
+	file << "        agent->state = 6;" << endl;
+	file << "        add_" << agent << "_agent(" << agent << "_agents, 0.0, 0, agent->count, agent->id,  AGENT_STATE_" << agent << "_DEFAULT, 1 ,agent->vx, agent->vy, agent->vz, agent->x, agent->y, agent->z );" << endl;
+	file << "    }" << endl;
+	file << "     return 0;" << endl;
+	file << "  }" << endl;
 }//-------------------------------------------------------------
 
 //-------------------------------------------------------------
@@ -511,8 +497,4 @@ void death_function(string master){
 	file << "__FLAME_GPU_FUNC__ int death_" << master << "(xmachine_memory_" << master << "* agent){" << endl << endl;
 	file << "  return 1;" << endl << endl;
 	file << "}" << endl;
-
-
-	cout << "death:" << master << endl;
-
 }//-------------------------------------------------------------

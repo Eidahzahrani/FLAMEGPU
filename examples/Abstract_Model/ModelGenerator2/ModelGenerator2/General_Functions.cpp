@@ -23,6 +23,10 @@ void addMaster(string master, vector<FileAgent> slaves, vector<FileAgent>combind
 	agent.addAgentVariable<float>("x");
 	agent.addAgentVariable<float>("y");
 	agent.addAgentVariable<float>("z");
+	agent.addAgentVariable<float>("vx");
+	agent.addAgentVariable<float>("vy");
+	agent.addAgentVariable<float>("vz");
+	agent.addAgentVariable<int>("count");
 	agent.addAgentVariable<int>("type");
 	agent.addAgentVariable<int>("state");
 	agent.addAgentVariable<float>("closest_point");
@@ -103,7 +107,7 @@ void addMaster(string master, vector<FileAgent> slaves, vector<FileAgent>combind
 		s = combinds[0].getName();
 		string_counter = to_string(i);
 		function_name = "created_" + s + string_counter;
-		cout << "function name====" << function_name << endl;
+		//cout << "function name====" << function_name << endl;
 		string statee = "moving_" + s;
 		//created_ function for the master agent 
 		AgentFunctionDescription created_(function_name, state);
@@ -138,7 +142,7 @@ void addMaster(string master, vector<FileAgent> slaves, vector<FileAgent>combind
 	agent.addAgentFunction(death);
 	model.addAgent(agent);
 
-	cout <<endl<< "done added master agent"<<master<<endl;
+	//cout <<endl<< "done added master agent"<<master<<endl;
 
 }
 void addSlave(vector<FileAgent> slaves, ModelDescription &model){
@@ -188,6 +192,10 @@ void addSlave(vector<FileAgent> slaves, ModelDescription &model){
 		agent.addAgentVariable<float>("x");
 		agent.addAgentVariable<float>("y");
 		agent.addAgentVariable<float>("z");
+		agent.addAgentVariable<float>("vx");
+		agent.addAgentVariable<float>("vy");
+		agent.addAgentVariable<float>("vz");
+		agent.addAgentVariable<int>("count");
 		agent.addAgentVariable<int>("type");
 		agent.addAgentVariable<int>("state");
 		agent.addAgentVariable<float>("closest_point");
@@ -204,7 +212,7 @@ void addSlave(vector<FileAgent> slaves, ModelDescription &model){
 		move.setEndState(state);
 		move.setRNG("true");
 		agent.addAgentFunction(move);
-		cout << "____the functions are:" << function_name << endl;
+		//cout << "____the functions are:" << function_name << endl;
 		//send_location function 
 		function_name = "send_location" + s;
 		AgentFunctionDescription send_location(function_name , state);
@@ -216,7 +224,7 @@ void addSlave(vector<FileAgent> slaves, ModelDescription &model){
 		send_location.setEndState(state);
 		agent.addAgentFunction(send_location);
 
-		cout << "--" << function_name;
+		//cout << "--" << function_name;
 		//receive_bind function 
 		function_name = "receive_bind" + s;
 		AgentFunctionDescription receive_bind(function_name, state);
@@ -225,7 +233,7 @@ void addSlave(vector<FileAgent> slaves, ModelDescription &model){
 		receive_bind.setIntialState(state);
 		receive_bind.setEndState(state);
 		agent.addAgentFunction(receive_bind);
-		cout << "--" << function_name;
+		//cout << "--" << function_name;
 
 		//combined function
 		function_name = "send_combined" + s;
@@ -240,14 +248,14 @@ void addSlave(vector<FileAgent> slaves, ModelDescription &model){
 		send_combined.setEndState(state);
 		send_combined.setRealocate("true");
 		agent.addAgentFunction(send_combined);
-		cout << "--" << function_name;
+		//cout << "--" << function_name;
 
 		model.addMessage(message);
 		model.addMessage(message1);
 		model.addMessage(message2);
 		model.addAgent(agent);
-		cout << "the agent is:" << agent.getName();
-		cout << endl << "done added slave agent" << s << endl;
+		//cout << "the agent is:" << agent.getName();
+		//cout << endl << "done added slave agent" << s << endl;
 	}
 	
 }
@@ -263,6 +271,10 @@ void addCombind(vector<FileAgent> combind, ModelDescription &model){
 		agent.addAgentVariable<float>("x");
 		agent.addAgentVariable<float>("y");
 		agent.addAgentVariable<float>("z");
+		agent.addAgentVariable<float>("vx");
+		agent.addAgentVariable<float>("vy");
+		agent.addAgentVariable<float>("vz");
+		agent.addAgentVariable<int>("count");
 		agent.addAgentVariable<int>("type");
 		agent.addAgentVariable<int>("state");
 		agent.addAgentVariable<float>("closest_point");
@@ -283,98 +295,80 @@ void addCombind(vector<FileAgent> combind, ModelDescription &model){
 		model.addAgent(agent);
 		
 		
-		cout << endl << "done added combind agent" << s << endl;
+		//cout << endl << "done added combind agent" << s << endl;
 
 	}
 
 
 }
 void addlayer(int line, string master, vector<FileAgent> slaves, vector<FileAgent>combinds, ModelDescription &model){
-	cout << "add layer*******" << line;
-	
-	std::vector<std::string>layer1;
-	std::vector<std::string>layer2;
-	std::vector<std::string>layer3;
-	std::vector<std::string>layer4;
-	std::vector<std::string>layer5;
-	std::vector<std::string>layer6;
-	std::vector<std::string>layer7;
+	//cout << "add layer*******" << line << endl;
+
+	std::vector<std::string>layerone;
 	std::vector<std::string>layer8;
 	std::vector<std::string>layer9;
 	std::vector<std::string>layer;
+	std::vector<std::string>Maxlayer;
 	string s;
-	
+
 
 	s = "move_" + master;
-	layer1.push_back(s);
+	layerone.push_back(s);
 
-	s = "death_" + master;
-	layer8.push_back(s);
+	//s = "death_" + master;
+	//layer8.push_back(s);
 
 	for (int i = 0; i < slaves.size(); i++){
+
 		s = "move_" + slaves[i].getName();
-		layer1.push_back(s);
-		std::vector<std::string>layeri;
+		layerone.push_back(s);
+
 		s = "send_location" + slaves[i].getName();
-		layer2.push_back(s);
+		Maxlayer.push_back(s);
 
 		s = "need_location" + slaves[i].getName();
-		layer3.push_back(s);
+		Maxlayer.push_back(s);
 
 		s = "send_bind" + slaves[i].getName();
-		layer4.push_back(s);
+		Maxlayer.push_back(s);
 
 		s = "receive_bind" + slaves[i].getName();
-		layer5.push_back(s);
+		Maxlayer.push_back(s);
 
 		s = "send_combined" + slaves[i].getName();
-		layer6.push_back(s);
-		s = "created_" + combinds[i].getName() + to_string(i);
-		layer7.push_back(s);
-
+		Maxlayer.push_back(s);
+		//cout << "here" << endl;
+		s = "created_" + combinds[0].getName() + to_string(i);
+		//cout << s << endl;
+		Maxlayer.push_back(s);
+		s = "death_" + master;
+		//cout << s << endl;
+		Maxlayer.push_back(s);
 	}
 
 	for (int i = 0; i < combinds.size(); i++){
 
-		
-		cout << "combind____"<<combinds[i].getName();
+		//cout << "combind____" << combinds[i].getName();
 		s = "move_" + combinds[i].getName();
 		layer9.push_back(s);
 	}
 	line = line * 10;
-	cout << "counter:  " << counter + line;
-	model.addALayer(counter + line, layer1);
+	//cout << "counter:  " << counter + line;
+	model.addALayer(counter + line, layerone);
 	++counter;
-	cout << "counter:  " << counter + line;
-	model.addALayer(counter + line, layer2);
-	++counter;
-	cout << "counter:  " << counter + line;
-	for (int i = 0; i < slaves.size(); i++){
-		layer.push_back(layer3[i]);
+	int l;
+	l = slaves.size() * 7;
+	//cout << "L" << l << endl;
+	for (int i = 0; i<l; i++){
+		//cout << "this is model layer:" << i << endl;
+		layer.push_back(Maxlayer[i]);
 		model.addALayer(line + counter, layer);
 		layer.clear();
 		++counter;
-		cout << "counter:  " << counter + line;
 	}
-		for (int i = 0; i < slaves.size(); i++){
-			layer.push_back(layer4[i]);
-			model.addALayer(line + counter , layer);
-			layer.clear();
-			++counter;
-			cout << "counter:  " << counter+line;
-	}
-	model.addALayer(counter+line, layer5);
-	++counter;
-	cout << "counter:  " << counter + line;
-	model.addALayer(counter + line, layer6);
-	++counter;
-	cout << "counter:  " << counter + line;
-	model.addALayer(counter + line, layer7);
-	++counter;
-	cout << "counter:  " << counter + line;
-	model.addALayer(counter + line, layer8);
-	++counter;
-	cout << "counter:  " << counter + line;
+	//model.addALayer(counter + line, layer8);
+	//++counter;
 	model.addALayer(counter + line, layer9);
+
 
 }
