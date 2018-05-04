@@ -1217,11 +1217,18 @@ __global__ void GPUFLAME_<xsl:value-of select="xmml:name"/>(xmachine_memory_<xsl
 	int index = global_position.x + (global_position.y * width);
 	</xsl:if>
 
+	//Normal copy from agent memory disabled
 	//SoA to AoS - xmachine_memory_<xsl:value-of select="xmml:name"/> Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_<xsl:value-of select="../../xmml:name"/> agent;<xsl:for-each select="../../xmml:memory/gpu:variable"><xsl:choose><xsl:when test="xmml:arrayLength">
+	//xmachine_memory_<xsl:value-of select="../../xmml:name"/> agent;<xsl:for-each select="../../xmml:memory/gpu:variable"><xsl:choose><xsl:when test="xmml:arrayLength">
+    //agent.<xsl:value-of select="xmml:name"/> = &amp;(agents-&gt;<xsl:value-of select="xmml:name"/>[index]);</xsl:when><xsl:otherwise>
+	//agent.<xsl:value-of select="xmml:name"/> = agents-&gt;<xsl:value-of select="xmml:name"/>[index];</xsl:otherwise></xsl:choose></xsl:for-each>
+
+	//Data aware copy from agent memory
+	//SoA to AoS - xmachine_memory_<xsl:value-of select="xmml:name"/> Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_<xsl:value-of select="../../xmml:name"/> agent;<xsl:for-each select="xmml:in_datadependency/xmml:dependencyVariable"><xsl:choose><xsl:when test="xmml:arrayLength">
     agent.<xsl:value-of select="xmml:name"/> = &amp;(agents-&gt;<xsl:value-of select="xmml:name"/>[index]);</xsl:when><xsl:otherwise>
 	agent.<xsl:value-of select="xmml:name"/> = agents-&gt;<xsl:value-of select="xmml:name"/>[index];</xsl:otherwise></xsl:choose></xsl:for-each>
-
+	
 	//FLAME function call
 	<xsl:if test="../../gpu:type='continuous'">int dead = !</xsl:if><xsl:value-of select="xmml:name"/>(&amp;agent<xsl:if test="xmml:xagentOutputs/gpu:xagentOutput">, <xsl:value-of select="xmml:xagentOutputs/gpu:xagentOutput/xmml:xagentName"/>_agents</xsl:if>
 	<xsl:if test="xmml:inputs/gpu:input"><xsl:variable name="messagename" select="xmml:inputs/gpu:input/xmml:messageName"/>, <xsl:value-of select="xmml:inputs/gpu:input/xmml:messageName"/>_messages<xsl:for-each select="../../../../xmml:messages/gpu:message[xmml:name=$messagename]"><xsl:if test="gpu:partitioningSpatial">, partition_matrix</xsl:if></xsl:for-each></xsl:if>
@@ -1231,8 +1238,13 @@ __global__ void GPUFLAME_<xsl:value-of select="xmml:name"/>(xmachine_memory_<xsl
 	<xsl:if test="../../gpu:type='continuous'">//continuous agent: set reallocation flag
 	agents-&gt;_scan_input[index]  = dead; </xsl:if>
 
+	//Normal copy from agent memory disabled
 	//AoS to SoA - xmachine_memory_<xsl:value-of select="xmml:name"/> Coalesced memory write (ignore arrays)<xsl:for-each select="../../xmml:memory/gpu:variable"><xsl:if test="not(xmml:arrayLength)">
-	agents-&gt;<xsl:value-of select="xmml:name"/>[index] = agent.<xsl:value-of select="xmml:name"/>;</xsl:if></xsl:for-each>
+	//agents-&gt;<xsl:value-of select="xmml:name"/>[index] = agent.<xsl:value-of select="xmml:name"/>;</xsl:if></xsl:for-each>
+
+	//Data aware copy from agent memory
+	//AoS to SoA - xmachine_memory_<xsl:value-of select="xmml:name"/> Coalesced memory write (ignore arrays)<xsl:for-each select="xmml:out_datadependency/xmml:dependencyVariable"><xsl:if test="not(xmml:arrayLength)">
+	agents-&gt;<xsl:value-of select="xmml:name"/>[index] = agent.<xsl:value-of select="xmml:name"/>;</xsl:if></xsl:for-each>	
 }
 </xsl:for-each>
 	
