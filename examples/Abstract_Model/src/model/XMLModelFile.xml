@@ -1,26 +1,11 @@
 <gpu:xmodel xmlns:gpu="http://www.dcs.shef.ac.uk/~paul/XMMLGPU"
 xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
-<name>Benchmark Model</name>
-<gpu:environment>
-	<gpu:functionFiles>
-		<file>functions.c</file>
-	</gpu:functionFiles>
-	<gpu:initFunctions>
-		<gpu:initFunction>
-			<gpu:name>initFunction</gpu:name>
-		</gpu:initFunction>
-	</gpu:initFunctions>
-	<gpu:stepFunctions>
-		<gpu:stepFunction>
-			<gpu:name>stepFunction</gpu:name>
-		</gpu:stepFunction>
-	</gpu:stepFunctions>
-	<gpu:exitFunctions>
-		<gpu:exitFunction>
-			<gpu:name>exitFunction</gpu:name>
-		</gpu:exitFunction>
-	</gpu:exitFunctions>
-</gpu:environment>
+  <name>Benchmark Model</name>
+  <gpu:environment>
+    <gpu:functionFiles>
+      <file>functions.c</file>
+    </gpu:functionFiles>
+  </gpu:environment>
   <xagents>
     <gpu:xagent>
       <name>A</name>
