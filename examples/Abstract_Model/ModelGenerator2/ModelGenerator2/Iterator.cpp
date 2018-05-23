@@ -19,7 +19,7 @@ int S_S;
 int s = 0;
 int size_S = 0, size_C = 0, num = 0, itt = 0;
 float a, b, c;
-float x = 1.0;
+float x = 10.0;
 int size = 0;
 void iterations(FileModel m){
 
@@ -70,11 +70,11 @@ int writer(std::string s, int num, int itt, int state){
 	int size1 = num;
 
 	if (itt != 0){
-		itt = 100 * itt;
+		itt = 100000 * itt;
 		size1 = size1 + itt;
 		
 	}
-	else 	size1 = 100 + size1;
+	else 	size1 = 100000 + size1;
 	for (i; i <= size1-1; i++){
 
 		a_file << "<xagent>" << endl;
