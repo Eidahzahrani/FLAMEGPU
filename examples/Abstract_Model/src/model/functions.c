@@ -12,19 +12,65 @@
 #define _FLAMEGPU_FUNCTIONS
 #define AGENT_STATE_DEAD 3
 #define AGENT_STATE_BIND 2
+
 #define XMAX 		10.0f
 #define YMAX		  	10.0f
 #define ZMAX		  	10.0f
-#define radius 0.06f//Interaction radius
+#define radius 1.0f//Interaction radius
 #define DT 0.01
 #define MOVEMENT_TIME_RANGE 15//by increasing this we will make agents move across a larger amount of area and increase the chance that they will be within range of another agent to interact with
 #define MIN_MOVEMENT_TIME 5
 
-
+std::vector<int>Acounter;
+std::vector<int>Bcounter;
+std::vector<int>Ccounter;
+std::vector<int>Mcounter;
+std::vector<int>iteration;
+unsigned int h_iteration = 0;
 #define AGENT_STATE_A_DEFAULT 1
 #define AGENT_STATE_B_DEFAULT 4
 #define AGENT_STATE_C_DEFAULT 5
 
+/*
+*init_Function.....
+*/
+__FLAME_GPU_INIT_FUNC__ void initFunction(){
+
+	Acounter.push_back(get_agent_A_moving_A_count());
+	Bcounter.push_back(get_agent_B_moving_B_count());
+	Ccounter.push_back(get_agent_C_moving_C_count());
+	//Mcounter.push_back(messageCounter);
+	iteration.push_back(0);
+	fflush(stdout);
+}
+/*
+*step_Function.....
+*/
+__FLAME_GPU_STEP_FUNC__ void stepFunction(){
+
+	h_iteration++;
+	iteration.push_back(h_iteration);
+	Acounter.push_back(get_agent_A_moving_A_count());
+	Bcounter.push_back(get_agent_B_moving_B_count());
+	Ccounter.push_back(get_agent_C_moving_C_count());
+	//Mcounter.push_back(messageCounter);
+
+	fflush(stdout);
+}
+/*
+*Exit_Function.....
+*/
+__FLAME_GPU_EXIT_FUNC__ void exitFunction(){
+
+	FILE *output = fopen("output.dat", "w");
+
+	fprintf(output, "#IA B C M \n ");
+
+	for (int i = 0; i < h_iteration; i++){
+		fprintf(output, "%u %d %d %d  \n ", iteration[i], Acounter[i], Bcounter[i], Ccounter[i]);
+	}
+	fclose(output);
+}
 /*
 * move_A FLAMEGPU Agent Function
 */
@@ -161,7 +207,7 @@ __FLAME_GPU_FUNC__ int send_locationB(xmachine_memory_B* agent, xmachine_message
 __FLAME_GPU_FUNC__ int receive_bindB(xmachine_memory_B* agent, xmachine_message_bindB_list* bindB_messages, xmachine_message_bindB_PBM* partition_matrix){
 	int c = 0, nearest_id = 0;
 	float nearest_distance = 0.0f;
-	xmachine_message_bindB* current_message = get_first_bindB_message<true, true, true, false, false, false, false, false>(bindB_messages, partition_matrix, agent->x, agent->y, agent->z);
+	xmachine_message_bindB* current_message = get_first_bindB_message(bindB_messages, partition_matrix, agent->x, agent->y, agent->z);
 	//xmachine_message_bindB* current_message = get_first_bindB_message<true, true, true, true, true, true, true, true>(bindB_messages, partition_matrix, agent->x, agent->y, agent->z);
 
 	while (current_message)
@@ -179,7 +225,7 @@ __FLAME_GPU_FUNC__ int receive_bindB(xmachine_memory_B* agent, xmachine_message_
 				}
 			}
 		}
-		current_message = get_next_bindB_message<true, true, true, false, false, false, false, false>(current_message, bindB_messages, partition_matrix);
+		current_message = get_next_bindB_message(current_message, bindB_messages, partition_matrix);
 		//current_message = get_next_bindB_message<true, true, true, true, true, true, true, true>(current_message, bindB_messages, partition_matrix);
 
 	}
@@ -224,7 +270,7 @@ __FLAME_GPU_FUNC__ int need_locationB(xmachine_memory_A* agent, xmachine_message
 	y1 = agent->y;
 	z1 = agent->z;
 
-	xmachine_message_locationB* current_message = get_first_locationB_message<false, false, true, false, false, true, true, true>(locationB_messages, partition_matrix, agent->x, agent->y, agent->z);
+	xmachine_message_locationB* current_message = get_first_locationB_message(locationB_messages, partition_matrix, agent->x, agent->y, agent->z);
 
 	while (current_message)
 	{
@@ -245,7 +291,7 @@ __FLAME_GPU_FUNC__ int need_locationB(xmachine_memory_A* agent, xmachine_message
 				}
 			}
 		}
-		current_message = get_next_locationB_message<false, false, true, false, false, true, true, true>(current_message, locationB_messages, partition_matrix);
+		current_message = get_next_locationB_message(current_message, locationB_messages, partition_matrix);
 
 	}
 	if (c == 1) {
@@ -283,7 +329,7 @@ __FLAME_GPU_FUNC__ int send_bindB(xmachine_memory_A* agent, xmachine_message_bin
 __FLAME_GPU_FUNC__ int created_C0(xmachine_memory_A* agent, xmachine_memory_C_list* C_agents, xmachine_message_combinedB_list* combinedB_messages, xmachine_message_combinedB_PBM* partition_matrix, RNG_rand48* rand48){
 	int c = 0;
 
-	xmachine_message_combinedB* current_message = get_first_combinedB_message<true, false, true, false, false, false, false, false >(combinedB_messages, partition_matrix, agent->x, agent->y, agent->z);
+	xmachine_message_combinedB* current_message = get_first_combinedB_message(combinedB_messages, partition_matrix, agent->x, agent->y, agent->z);
 
 	while (current_message)
 	{
@@ -293,7 +339,7 @@ __FLAME_GPU_FUNC__ int created_C0(xmachine_memory_A* agent, xmachine_memory_C_li
 			}
 
 		}
-		current_message = get_next_combinedB_message<true, false, true, false, false, false, false, false >(current_message, combinedB_messages, partition_matrix);
+		current_message = get_next_combinedB_message(current_message, combinedB_messages, partition_matrix);
 	}
 	if (c >= 1) {
 		agent->state = 6;

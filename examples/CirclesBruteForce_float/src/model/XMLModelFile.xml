@@ -55,6 +55,11 @@
           <nextState>default</nextState>
           <inputs>
             <gpu:input><messageName>location</messageName></gpu:input>
+			<in_messagedependency>
+<dependencyVariable><name>id</name></dependencyVariable>
+<dependencyVariable><name>x</name></dependencyVariable>
+<dependencyVariable><name>y</name></dependencyVariable>
+</in_messagedependency>
           </inputs>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>

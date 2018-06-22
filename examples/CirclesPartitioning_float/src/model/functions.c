@@ -19,7 +19,7 @@
 
 #include "header.h"
 
-#define radius 2.0
+#define radius 1.0f
 
 
 __FLAME_GPU_FUNC__ int inputdata(xmachine_memory_Circle* xmemory, xmachine_message_location_list* location_messages, xmachine_message_location_PBM* partition_matrix)
@@ -59,7 +59,7 @@ __FLAME_GPU_FUNC__ int inputdata(xmachine_memory_Circle* xmemory, xmachine_messa
             }
         }
         //Move onto next message to check 
-        location_message = get_next_location_message(location_message, location_messages, partition_matrix);
+		location_message = get_next_location_message(location_message, location_messages, partition_matrix);
     }
     xmemory->fx = fx;
     xmemory->fy = fy;
@@ -69,13 +69,20 @@ __FLAME_GPU_FUNC__ int inputdata(xmachine_memory_Circle* xmemory, xmachine_messa
 
 __FLAME_GPU_FUNC__ int outputdata(xmachine_memory_Circle* xmemory, xmachine_message_location_list* location_messages)
 {
-    float x, y, z;
+    float x, y, z,a,b,c,d,e,f,g;
 
 	x = xmemory->x;
     y = xmemory->y;
 	z = xmemory->z;
-    
-	add_location_message(location_messages, xmemory->id, x, y, z);
+	
+    a= 1.0;
+	b= 1.0;
+	c= 1.0;
+	d= 1.0;
+	e= 1.0;
+	f= 1.0;
+	g= 1.0;	 
+	add_location_message(location_messages, xmemory->id, x, y, z,a,b,c,d,e,f,g);
 
 	return 0;
 }

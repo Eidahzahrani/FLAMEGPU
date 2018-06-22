@@ -70,11 +70,11 @@ int writer(std::string s, int num, int itt, int state){
 	int size1 = num;
 
 	if (itt != 0){
-		itt = 100000* itt;
+		itt = 4000* itt;
 		size1 = size1 + itt;
 		
 	}
-	else 	size1 = 100000 + size1;
+	else 	size1 = 4000 + size1;
 	for (i; i <= size1-1; i++){
 
 		a_file << "<xagent>" << endl;
@@ -84,7 +84,7 @@ int writer(std::string s, int num, int itt, int state){
 		a_file << "<x>" << a << "</x>" << endl;
 		b = ((float)rand() / (float)(RAND_MAX))* x;
 		a_file << "<y>" << b << "</y>" << endl;
-		c = ((float)rand() / (float)(RAND_MAX)) * x;
+		c = ((float)rand() / (float)(RAND_MAX)) * 1;
 		a_file << "<z>" << c << "</z>" << endl;
 		a_file << "<vx>0.0</vx>" << endl;
 		a_file << "<vy>0.0</vy>" << endl;

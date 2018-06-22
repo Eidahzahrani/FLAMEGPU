@@ -73,7 +73,12 @@ __constant__ int d_xmachine_memory_<xsl:value-of select="xmml:name"/>_count;
 <xsl:for-each select="gpu:xmodel/xmml:xagents/gpu:xagent/xmml:states/gpu:state">
 __constant__ int d_xmachine_memory_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_count;
 </xsl:for-each>
-
+<xsl:for-each select="gpu:xmodel/xmml:messages/gpu:message[gpu:partitioningSpatial]">
+<!-- new-->
+<!-- If we had within-layer concurrency, where 2 state lists access the same message list in same layer we would need multiple independant copies of this, and the load_first/ load_next would need to be aware.  -->
+<!-- @todo - change to bools - smaller variable and might help compiler -->
+__constant__ bool d_<xsl:value-of select="xmml:name"/>_message_read_deps[<xsl:value-of select="count(xmml:variables/gpu:variable)"/>];
+</xsl:for-each>
 /* Message constants */
 <xsl:for-each select="gpu:xmodel/xmml:messages/gpu:message">
 /* <xsl:value-of select="xmml:name"/> Message variables */
@@ -1063,6 +1068,8 @@ __device__ unsigned int message_<xsl:value-of select="xmml:name"/>_hash(glm::ive
  * @param cell_index the current cell index in agent_grid_cell+relative_cell
  * @return true if a message has been loaded into sm false otherwise
  */
+
+<!--template&lt; <xsl:for-each select="xmml:variables/gpu:variable">bool LOAD_<xsl:value-of select="xmml:name" /><xsl:if test="position()!=last()">, </xsl:if></xsl:for-each>&gt;-->
 __device__ int load_next_<xsl:value-of select="xmml:name"/>_message(xmachine_message_<xsl:value-of select="xmml:name"/>_list* messages, xmachine_message_<xsl:value-of select="xmml:name"/>_PBM* partition_matrix, glm::ivec3 relative_cell, int cell_index_max, glm::ivec3 agent_grid_cell, int cell_index)
 {
 	extern __shared__ int sm_data [];
@@ -1111,16 +1118,27 @@ __device__ int load_next_<xsl:value-of select="xmml:name"/>_message(xmachine_mes
 	
 	//get message data using texture fetch
 	xmachine_message_<xsl:value-of select="xmml:name"/> temp_message;
+
+
 	temp_message._relative_cell = relative_cell;
 	temp_message._cell_index_max = cell_index_max;
 	temp_message._cell_index = cell_index;
 	temp_message._agent_grid_cell = agent_grid_cell;
 
+<!-- @todo - Use LOAD_id, LOAD_x etc from previous version here.  -->
 	//Using texture cache
+	<xsl:variable name="message_name" select="xmml:name"/>
   <xsl:for-each select="xmml:variables/gpu:variable">
+  	<xsl:variable name="variable_name" select="xmml:name" />
+if(d_<xsl:value-of select="../../xmml:name"/>_message_read_deps[<xsl:value-of select="position() - 1"/>]){
   <xsl:choose>
-  <xsl:when test="xmml:type='double'">temp_message.<xsl:value-of select="xmml:name"/> = tex1DfetchDouble(tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>, cell_index + d_tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_offset);</xsl:when>
-  <xsl:otherwise>temp_message.<xsl:value-of select="xmml:name"/> = tex1Dfetch(tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>, cell_index + d_tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_offset); </xsl:otherwise></xsl:choose> </xsl:for-each>
+  <xsl:when test="xmml:type='double'">temp_message.<xsl:value-of select="$variable_name"/> = tex1DfetchDouble(tex_xmachine_message_<xsl:value-of select="message_name"/>_<xsl:value-of select="$variable_name"/>, cell_index + d_tex_xmachine_message_<xsl:value-of select="message_name"/>_<xsl:value-of select="$variable_name"/>_offset);</xsl:when>
+  <xsl:otherwise>temp_message.<xsl:value-of select="$variable_name"/> = tex1Dfetch(tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>, cell_index + d_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset); </xsl:otherwise>
+</xsl:choose> 
+}else {
+temp_message.<xsl:value-of select="$variable_name"/> = 0;
+}
+</xsl:for-each>
 
 	//load it into shared memory (no sync as no sharing between threads)
 	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_<xsl:value-of select="xmml:name"/>));
@@ -1143,8 +1161,8 @@ __device__ xmachine_message_<xsl:value-of select="xmml:name"/>* get_first_<xsl:v
 	int cell_index = 0;
 	glm::vec3 position = glm::vec3(x, y, z);
 	glm::ivec3 agent_grid_cell = message_<xsl:value-of select="xmml:name"/>_grid_position(position);
-	
-	if (load_next_<xsl:value-of select="xmml:name"/>_message(messages, partition_matrix, relative_cell, cell_index_max, agent_grid_cell, cell_index))
+	<!--add the new lines here-->
+	if (load_next_<xsl:value-of select="$message_name"/>_message(messages, partition_matrix, relative_cell, cell_index_max, agent_grid_cell, cell_index))
 	{
 		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_<xsl:value-of select="xmml:name"/>));
 		return ((xmachine_message_<xsl:value-of select="xmml:name"/>*)&amp;message_share[message_index]);
@@ -1164,12 +1182,11 @@ __device__ xmachine_message_<xsl:value-of select="xmml:name"/>* get_next_<xsl:va
 	char* message_share = (char*)&amp;sm_data[0];
 	
 	//TODO: check message count
-	
-	if (load_next_<xsl:value-of select="xmml:name"/>_message(messages, partition_matrix, message->_relative_cell, message->_cell_index_max, message->_agent_grid_cell, message->_cell_index))
+	if (load_next_<xsl:value-of select="$message_name"/>_message(messages, partition_matrix, message->_relative_cell, message->_cell_index_max, message->_agent_grid_cell, message->_cell_index))
 	{
 		//get conflict free address of 
-		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_<xsl:value-of select="xmml:name"/>));
-		return ((xmachine_message_<xsl:value-of select="xmml:name"/>*)&amp;message_share[message_index]);
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_<xsl:value-of select="$message_name"/>));
+		return ((xmachine_message_<xsl:value-of select="$message_name"/>*)&amp;message_share[message_index]);
 	}
 	else
 		return false;

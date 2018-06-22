@@ -56,6 +56,11 @@
           <inputs>
             <gpu:input>
               <messageName>location</messageName>
+			  <in_messagedependency>
+                <dependencyVariable><name>id</name></dependencyVariable>
+                <dependencyVariable><name>x</name></dependencyVariable>
+                <dependencyVariable><name>y</name></dependencyVariable>
+               </in_messagedependency>
             </gpu:input>
           </inputs>
           <gpu:reallocate>false</gpu:reallocate>
@@ -74,7 +79,7 @@
         <initialState>default</initialState>
       </states>
       <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>1024</gpu:bufferSize>
+      <gpu:bufferSize>1048576</gpu:bufferSize>
     </gpu:xagent>
   </xagents>
   <messages>
@@ -97,17 +102,45 @@
           <type>float</type>
           <name>z</name>
         </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>a</name>
+        </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>b</name>
+        </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>c</name>
+        </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>d</name>
+        </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>e</name>
+        </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>f</name>
+        </gpu:variable>
+		<gpu:variable>
+          <type>float</type>
+          <name>g</name>
+        </gpu:variable>
       </variables>
       <gpu:partitioningSpatial>
         <gpu:radius>1.0</gpu:radius>
         <gpu:xmin>0</gpu:xmin>
-        <gpu:xmax>8</gpu:xmax>
+        <gpu:xmax>1024</gpu:xmax>
         <gpu:ymin>0</gpu:ymin>
-        <gpu:ymax>8</gpu:ymax>
+        <gpu:ymax>1024</gpu:ymax>
         <gpu:zmin>0</gpu:zmin>
         <gpu:zmax>1.0</gpu:zmax>
       </gpu:partitioningSpatial>
-      <gpu:bufferSize>1024</gpu:bufferSize>
+      <gpu:bufferSize>1048576</gpu:bufferSize>
     </gpu:message>
   </messages>
   <layers>

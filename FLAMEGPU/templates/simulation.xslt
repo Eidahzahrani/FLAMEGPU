@@ -804,14 +804,73 @@ void <xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>
 	}
 	</xsl:if></xsl:for-each></xsl:if></xsl:if>
 	
+	<!--<xsl:variable name="function_name" select="xmml:name"/>-->
+    <xsl:variable name="function" select="."/>
+    <xsl:variable name="input_message_name" select="xmml:inputs/gpu:input/xmml:messageName"/>
+    <!--test <xsl:value-of select="$input_message_name"/>-->
+    <xsl:if test="xmml:inputs">
+    <xsl:for-each select="../../../../xmml:messages/gpu:message[xmml:name=$input_message_name]">
+    <!-- <xsl:for-each select="../../../../../xmml:messages/gpu:message[xmml:name='xmml:input/xmml:messageName']"> -->
+    <!-- function: <xsl:value-of select="." /> -->
+    bool h_<xsl:value-of select="xmml:name"/>_message_read_deps[<xsl:value-of select="count(xmml:variables/gpu:variable)"/>];
+    memset(&amp;h_<xsl:value-of select="xmml:name"/>_message_read_deps, false, sizeof(bool)* <xsl:value-of select="count(xmml:variables/gpu:variable)"/>);
+    <xsl:for-each select="xmml:variables/gpu:variable">
+	<xsl:variable name="variable_name" select="xmml:name" />
+    <xsl:if test="$function/xmml:inputs/gpu:input/xmml:in_messagedependency/xmml:dependencyVariable[xmml:name=$variable_name]">
+    h_<xsl:value-of select="../../xmml:name"/>_message_read_deps[<xsl:value-of select="position() - 1" />] = true;
+    </xsl:if>
+    </xsl:for-each>
+   gpuErrchk( cudaMemcpyToSymbol(d_<xsl:value-of select="xmml:name"/>_message_read_deps, h_<xsl:value-of select="xmml:name"/>_message_read_deps, sizeof(bool)*<xsl:value-of select="count(xmml:variables/gpu:variable)"/>));
+    </xsl:for-each>
+    </xsl:if>
+    
+	<!-- Comment -->
+    <!--
+	<xsl:if test="gpu:function/xmml:inputs">
+	<xsl:variable name="countdeps">
+    <xsl:value-of select="count(/xmml:in_messagedependency/xmml:dependencyVariable[xmml:name=$d])"/>
+    </xsl:variable>
+	bool message_read_deps[countdeps];
+
+    memset(h_message_read_deps, false, sizeof(bool)* countdeps)
+    <xsl:for-each select="xmml:in_messagedependency/xmml:dependencyVariable[xmml:name=$d]">">
+        h_message_location_read_deps[<xsl:value-of select="position()" />] = true;
+    </xsl:for-each>)
+    cudMemcpyToSymbol(message_read_deps, h_message_read_deps, sizeof(bool)* countdeps );
+    </xsl:if>
+    -->
 	<xsl:if test="xmml:inputs/gpu:input"><xsl:variable name="messageName" select="xmml:inputs/gpu:input/xmml:messageName"/>
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	<xsl:for-each select="../../../../xmml:messages/gpu:message[xmml:name=$messageName]">
 	<xsl:if test="gpu:partitioningDiscrete or gpu:partitioningSpatial">//any agent with discrete or partitioned message input uses texture caching
-	<xsl:for-each select="xmml:variables/gpu:variable">size_t tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_byte_offset;    
-	gpuErrchk( cudaBindTexture(&amp;tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_byte_offset, tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>, d_<xsl:value-of select="../../xmml:name"/>s-><xsl:value-of select="xmml:name"/>, sizeof(<xsl:value-of select="xmml:type"/>)*xmachine_message_<xsl:value-of select="../../xmml:name"/>_MAX));
-	h_tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_offset = (int)tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_byte_offset / sizeof(<xsl:value-of select="xmml:type"/>);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_offset, &amp;h_tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>_offset, sizeof(int)));
+	<xsl:for-each select="xmml:variables/gpu:variable">
+	<xsl:variable name="variable_name" select="xmml:name" />
+	<xsl:variable name="type" select="xmml:type" />
+	<xsl:variable name="message_name" select="../../xmml:name" />
+
+	<!-- @untested -->
+	<xsl:choose>
+	<!-- If there are no dependancies, bind textures -->
+	<xsl:when test="not($function/xmml:inputs/gpu:input/xmml:in_messagedependency)">
+	size_t tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_byte_offset;    
+	gpuErrchk( cudaBindTexture(&amp;tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_byte_offset, tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>, d_<xsl:value-of select="$message_name"/>s-><xsl:value-of select="$variable_name"/>, sizeof(<xsl:value-of select="$type"/>)*xmachine_message_<xsl:value-of select="$message_name"/>_MAX));
+	h_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset = (int)tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_byte_offset / sizeof(<xsl:value-of select="$type"/>);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset, &amp;h_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset, sizeof(int)));
+	</xsl:when>
+	<xsl:otherwise>
+		<!-- Otherwise if there is a dependancy for this input, only bind the relevant textures -->
+	<xsl:for-each select="$function/xmml:inputs/gpu:input/xmml:in_messagedependency/xmml:dependencyVariable[xmml:name=$variable_name]">
+	size_t tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_byte_offset;    
+	gpuErrchk( cudaBindTexture(&amp;tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_byte_offset, tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>, d_<xsl:value-of select="$message_name"/>s-><xsl:value-of select="$variable_name"/>, sizeof(<xsl:value-of select="$type"/>)*xmachine_message_<xsl:value-of select="$message_name"/>_MAX));
+	h_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset = (int)tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_byte_offset / sizeof(<xsl:value-of select="$type"/>);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset, &amp;h_tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>_offset, sizeof(int)));
+	</xsl:for-each>
+	</xsl:otherwise>
+	</xsl:choose>
+ 
+
+
+
 	</xsl:for-each><xsl:if test="gpu:partitioningSpatial">//bind pbm start and end indices to textures
 	size_t tex_xmachine_message_<xsl:value-of select="xmml:name"/>_pbm_start_byte_offset;
 	size_t tex_xmachine_message_<xsl:value-of select="xmml:name"/>_pbm_end_or_count_byte_offset;
@@ -863,7 +922,28 @@ void <xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	<xsl:for-each select="../../../../xmml:messages/gpu:message[xmml:name=$messageName]">
 	<xsl:if test="gpu:partitioningDiscrete or gpu:partitioningSpatial">//any agent with discrete or partitioned message input uses texture caching
-	<xsl:for-each select="xmml:variables/gpu:variable">gpuErrchk( cudaUnbindTexture(tex_xmachine_message_<xsl:value-of select="../../xmml:name"/>_<xsl:value-of select="xmml:name"/>));
+	<xsl:for-each select="xmml:variables/gpu:variable">
+	<xsl:variable name="variable_name" select="xmml:name" />
+	<xsl:variable name="message_name" select="../../xmml:name" />
+
+	<!-- @untested -->
+	<xsl:choose>
+	<!-- If there are no dependancies, unbind textures -->
+	<xsl:when test="not($function/xmml:inputs/gpu:input/xmml:in_messagedependency)">
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>));
+	</xsl:when>
+	<xsl:otherwise>
+		<!-- Otherwise if there is a dependancy for this input, unbind the relevant textures -->
+	<xsl:for-each select="$function/xmml:inputs/gpu:input/xmml:in_messagedependency/xmml:dependencyVariable[xmml:name=$variable_name]">
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_<xsl:value-of select="$message_name"/>_<xsl:value-of select="$variable_name"/>));
+	</xsl:for-each>
+	</xsl:otherwise>
+	</xsl:choose>
+
+		
+
+
+
 	</xsl:for-each><xsl:if test="gpu:partitioningSpatial">//unbind pbm indices
     gpuErrchk( cudaUnbindTexture(tex_xmachine_message_<xsl:value-of select="xmml:name"/>_pbm_start));
     gpuErrchk( cudaUnbindTexture(tex_xmachine_message_<xsl:value-of select="xmml:name"/>_pbm_end_or_count));

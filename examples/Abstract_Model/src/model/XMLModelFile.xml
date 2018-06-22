@@ -5,6 +5,21 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
     <gpu:functionFiles>
       <file>functions.c</file>
     </gpu:functionFiles>
+    <gpu:initFunctions>
+      <gpu:initFunction>
+        <gpu:name>initFunction</gpu:name>
+      </gpu:initFunction>
+    </gpu:initFunctions>
+    <gpu:stepFunctions>
+      <gpu:stepFunction>
+        <gpu:name>stepFunction</gpu:name>
+      </gpu:stepFunction>
+    </gpu:stepFunctions>
+    <gpu:exitFunctions>
+      <gpu:exitFunction>
+        <gpu:name>exitFunction</gpu:name>
+      </gpu:exitFunction>
+    </gpu:exitFunctions>
   </gpu:environment>
   <xagents>
     <gpu:xagent>
@@ -164,6 +179,9 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
             <dependencyVariable>
               <name>count</name>
             </dependencyVariable>
+            <dependencyVariable>
+              <name>state</name>
+            </dependencyVariable>
           </in_datadependency>
           <out_datadependency>
             <dependencyVariable>
@@ -210,6 +228,15 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
             </dependencyVariable>
             <dependencyVariable>
               <name>id</name>
+            </dependencyVariable>
+            <dependencyVariable>
+              <name>state</name>
+            </dependencyVariable>
+            <dependencyVariable>
+              <name>closest_point</name>
+            </dependencyVariable>
+            <dependencyVariable>
+              <name>closest_id</name>
             </dependencyVariable>
           </in_datadependency>
           <out_datadependency >
@@ -371,6 +398,9 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
             <dependencyVariable>
               <name>count</name>
             </dependencyVariable>
+            <dependencyVariable>
+              <name>state</name>
+            </dependencyVariable>
           </in_datadependency>
           <out_datadependency>
             <dependencyVariable>
@@ -420,6 +450,12 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
             </dependencyVariable>
             <dependencyVariable>
               <name>state</name>
+            </dependencyVariable>
+            <dependencyVariable>
+              <name>closest_point</name>
+            </dependencyVariable>
+            <dependencyVariable>
+              <name>closest_id</name>
             </dependencyVariable>
           </in_datadependency>
           <out_datadependency>
@@ -620,6 +656,9 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
             <dependencyVariable>
               <name>count</name>
             </dependencyVariable>
+            <dependencyVariable>
+              <name>state</name>
+            </dependencyVariable>
           </in_datadependency>
           <out_datadependency>
             <dependencyVariable>
@@ -699,13 +738,13 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
         </gpu:variable>
       </variables>
       <gpu:partitioningSpatial>
-        <gpu:radius>0.1</gpu:radius>
+        <gpu:radius>1.0</gpu:radius>
         <gpu:xmin>0.0</gpu:xmin>
         <gpu:xmax>10.0</gpu:xmax>
         <gpu:ymin>0.0</gpu:ymin>
         <gpu:ymax>10.0</gpu:ymax>
         <gpu:zmin>0.0</gpu:zmin>
-        <gpu:zmax>10.0</gpu:zmax>
+        <gpu:zmax>1.0</gpu:zmax>
       </gpu:partitioningSpatial>
       <gpu:bufferSize>1048576</gpu:bufferSize>
     </gpu:message>
@@ -746,13 +785,13 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
         </gpu:variable>
       </variables>
       <gpu:partitioningSpatial>
-        <gpu:radius>0.1</gpu:radius>
+        <gpu:radius>1.0</gpu:radius>
         <gpu:xmin>0.0</gpu:xmin>
         <gpu:xmax>10.0</gpu:xmax>
         <gpu:ymin>0.0</gpu:ymin>
         <gpu:ymax>10.0</gpu:ymax>
         <gpu:zmin>0.0</gpu:zmin>
-        <gpu:zmax>10.0</gpu:zmax>
+        <gpu:zmax>1.0</gpu:zmax>
       </gpu:partitioningSpatial>
       <gpu:bufferSize>1048576</gpu:bufferSize>
     </gpu:message>
@@ -793,13 +832,13 @@ xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
         </gpu:variable>
       </variables>
       <gpu:partitioningSpatial>
-        <gpu:radius>0.1</gpu:radius>
+        <gpu:radius>1.0</gpu:radius>
         <gpu:xmin>0.0</gpu:xmin>
         <gpu:xmax>10.0</gpu:xmax>
         <gpu:ymin>0.0</gpu:ymin>
         <gpu:ymax>10.0</gpu:ymax>
         <gpu:zmin>0.0</gpu:zmin>
-        <gpu:zmax>10.0</gpu:zmax>
+        <gpu:zmax>1.0</gpu:zmax>
       </gpu:partitioningSpatial>
       <gpu:bufferSize>1048576</gpu:bufferSize>
     </gpu:message>
